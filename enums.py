@@ -104,3 +104,36 @@ dan_names_dict = {
     29: "God of Destruction",
     100: "God of Destruction"
 }
+
+rank_color_dict = {
+    0: "#c0b7ac", # beginner/dans
+    1: "#c0b7ac",
+    2: "#c0b7ac",
+    3: "#4fedf3", # teal?
+    4: "#4fedf3",
+    5: "#4fedf3",
+    6: "#36e93e", # green
+    7: "#36e93e",
+    8: "#36e93e",
+    9: "#f4ce27", # yellow
+    10: "#f4ce27",
+    11: "#f4ce27",
+    12: "#e58026", # orange
+    13: "#e58026",
+    14: "#e58026",
+    15: "#f33f3c", # red
+    16: "#f33f3c",
+    17: "#f33f3c",
+    18: "#8a1fbe", # ruler
+    19: "#8a1fbe",
+    20: "#8a1fbe",
+    21: "#1ba9f2", # blue
+    22: "#1ba9f2",
+    23: "#1ba9f2",
+    24: "#1ba9f2",
+    25: "#7b1b79", # tekken king
+    26: "#7b1b79",
+    27: "#ffff6f", # tekken god
+    28: "#ffff6f",
+    29: "#fe718e", # god of destruction
+}

@@ -1,40 +1,52 @@
 import os
 import json
 import pandas as pd
+from pathlib import Path
+import re
+from datetime import datetime
+from itertools import compress
 
-def read_data(folder_path):
-	master_list = []
+def get_matches_from_dir(data_dir=os.path.join(os.getcwd(), "match_data"), start_date: str | None = None, 
+						 end_date: str | None = None) -> tuple[pd.DataFrame, int]:
+	fps = list(Path(data_dir).rglob("*.json"))
+	if start_date or end_date:
+		fps = filter_fps_by_dates(fps, start_date, end_date)
+
+	matches = []
 	failure_count = 0
-	success_count = 0
-	# Iterate over the files in the folder
-	for filename in os.listdir(folder_path):
-		if filename.endswith('.json'):
-			# print(f'Processing file: {filename}')
-			file_path = os.path.join(folder_path, filename)
 
-			# Load the JSON file
-			try:
-				with open(file_path) as f:
-					# remove any preceding or trailing whitespace
-					json_String = f.read().strip()
-					data = json.loads(json_String)
-					master_list.extend(data['replayDetailList']) # Combine the lengths into the master list
-					success_count += 1
-			except Exception as e:
-				# print(f'Error processing file: {filename}')
-				failure_count += 1
+	for fp in fps:
+		try:
+			with open(fp) as f:
+				json_String = f.read().strip()
+				data = json.loads(json_String)
+				matches.extend(data['replayDetailList'])
+		except Exception as e:
+			failure_count += 1
 
-	# Print the lengths of replayDetailList for each JSON file
-	print(f'Read {len(master_list)} games from {success_count} files')
-	print(f'{failure_count} files were unable to be read')
+	df = pd.DataFrame(matches)
+	df = df.drop_duplicates(subset='battleId', keep="last")
+	return df, failure_count
 
-	return master_list
+def filter_fps_by_dates(fps: list[str], start_date: str | None, end_date: str | None) -> list[str]:
+	matches = list(map(lambda fn: re.search(r"\d\d_\d\d_\d\d", str(fn)), fps))
+	if not all(matches):
+		print("ERROR: Wrong file format present in data. All folders in match_data/ should contain"
+				" a date in the form of '%m_%d_%y'")
+		os.exit(1)
+	dates = list(map(lambda match: datetime.strptime(match.group(), r"%m_%d_%y"), matches))
+	
+	if start_date:
+		start_date = datetime.strptime(start_date, r"%m_%d_%y")
+		is_valid = list(map(lambda d: d >= start_date, dates))
+		fps = compress(fps, is_valid)
 
-def read_data_into_dataframe(folder_path):
-	master_list = read_data(folder_path)
-	master_df = pd.DataFrame(master_list)
-	return master_df.drop_duplicates(subset='battleId', keep="last")
+	if end_date:
+		end_date = datetime.strptime(end_date, r"%m_%d_%y")
+		is_valid = list(map(lambda d: d <= end_date, dates))
+		fps = compress(fps, is_valid)
 
+	return fps
 
 # Example of a match
 # {
