@@ -24,12 +24,13 @@ def plot_categorical_histogram(df, x: str, xlabels: list[str], colors: list[str]
     plt.show()
 
 
-def plot_bar(df, x: str, y: str, xlabels: list[str], colors: list[str], title: str, ylim=None, annot_format=".2f", **kwargs):
+def plot_bar(df, x: str, y: str, xlabels: list[str], colors: list[str], title: str, ylim=None, annot=True, annot_format=".2f", **kwargs):
     bar = sns.barplot(df, x=x, y=y, hue=x, palette=colors, legend=False, edgecolor="black", **kwargs)
     for i, p in enumerate(sorted([p for p in bar.patches if p.get_height() > 0], key=lambda p: p.get_height())):
         if "order" in kwargs:
             p.set_color(colors[i])
-        bar.annotate(f"{p.get_height():{annot_format}}%\n", (p.get_x() + p.get_width() / 2, p.get_height()), ha="center", va="center")
+        if annot:
+            bar.annotate(f"{p.get_height():{annot_format}}%\n", (p.get_x() + p.get_width() / 2, p.get_height()), ha="center", va="center")
 
     plt.xticks(ticks=range(len(xlabels)), labels=xlabels, rotation=90)
     plt.xlabel("")
